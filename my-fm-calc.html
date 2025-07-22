@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Ads Campaign Calculator</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles for the calculator */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom styling for slider thumbs to ensure visibility and usability */
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #3b82f6; /* blue-500 */
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        }
+
+        input[type=range]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #3b82f6; /* blue-500 */
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <!-- Main calculator container -->
+    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-6 md:p-8 space-y-6">
+        
+        <!-- Header -->
+        <div class="text-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Radio Ad Campaign Calculator</h1>
+            <p class="text-gray-500 mt-1">Estimate your campaign costs instantly.</p>
+        </div>
+
+        <!-- Sliders Section -->
+        <div class="space-y-6 pt-4">
+            <!-- Ad Duration Slider -->
+            <div>
+                <label for="adDuration" class="flex justify-between text-sm font-medium text-gray-700">
+                    <span>Ad Duration (Seconds)</span>
+                    <span id="adDurationValue" class="font-bold text-blue-600">30s</span>
+                </label>
+                <input id="adDuration" type="range" min="10" max="60" value="30" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2">
+            </div>
+
+            <!-- Spots Per Day Slider -->
+            <div>
+                <label for="spotsPerDay" class="flex justify-between text-sm font-medium text-gray-700">
+                    <span>Spots Per Day</span>
+                    <span id="spotsPerDayValue" class="font-bold text-blue-600">15</span>
+                </label>
+                <input id="spotsPerDay" type="range" min="1" max="100" value="15" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2">
+            </div>
+
+            <!-- Days Slider -->
+            <div>
+                <label for="days" class="flex justify-between text-sm font-medium text-gray-700">
+                    <span>Number of Days</span>
+                    <span id="daysValue" class="font-bold text-blue-600">10</span>
+                </label>
+                <input id="days" type="range" min="1" max="365" value="10" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2">
+            </div>
+
+            <!-- Rate Per Second Slider -->
+            <div>
+                <label for="ratePerSec" class="flex justify-between text-sm font-medium text-gray-700">
+                    <span>Rate Per Second (₹)</span>
+                    <span id="ratePerSecValue" class="font-bold text-blue-600">₹3.00</span>
+                </label>
+                <input id="ratePerSec" type="range" min="2.0" max="5.0" value="3.0" step="0.01" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2">
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-200"></div>
+
+        <!-- Results Section -->
+        <div class="space-y-4">
+            <h2 class="text-xl font-semibold text-gray-800 text-center">Cost Breakdown</h2>
+            <div class="bg-gray-50 rounded-lg p-4 space-y-3 text-gray-700">
+                <div class="flex justify-between items-center">
+                    <p>Total Seconds:</p>
+                    <p id="totalSeconds" class="font-semibold text-lg">4500</p>
+                </div>
+                <div class="flex justify-between items-center">
+                    <p>Amount (before tax):</p>
+                    <p id="amount" class="font-semibold text-lg">₹13,500.00</p>
+                </div>
+                <div class="flex justify-between items-center">
+                    <p>GST (18%):</p>
+                    <p id="gst" class="font-semibold text-lg">₹2,430.00</p>
+                </div>
+            </div>
+            
+            <!-- Grand Total -->
+            <div class="bg-blue-600 text-white rounded-lg p-4 mt-4 flex justify-between items-center">
+                <p class="text-lg font-bold">Grand Total:</p>
+                <p id="grandTotal" class="text-2xl font-extrabold">₹15,930.00</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- DOM Element Selection ---
+        // Sliders
+        const adDurationSlider = document.getElementById('adDuration');
+        const spotsPerDaySlider = document.getElementById('spotsPerDay');
+        const daysSlider = document.getElementById('days');
+        const ratePerSecSlider = document.getElementById('ratePerSec');
+
+        // Value Displays
+        const adDurationValue = document.getElementById('adDurationValue');
+        const spotsPerDayValue = document.getElementById('spotsPerDayValue');
+        const daysValue = document.getElementById('daysValue');
+        const ratePerSecValue = document.getElementById('ratePerSecValue');
+
+        // Result Displays
+        const totalSecondsEl = document.getElementById('totalSeconds');
+        const amountEl = document.getElementById('amount');
+        const gstEl = document.getElementById('gst');
+        const grandTotalEl = document.getElementById('grandTotal');
+
+        // --- Calculation Function ---
+        function calculateAndDisplay() {
+            // 1. Get current values from sliders
+            const duration = parseInt(adDurationSlider.value);
+            const spots = parseInt(spotsPerDaySlider.value);
+            const days = parseInt(daysSlider.value);
+            const rate = parseFloat(ratePerSecSlider.value);
+
+            // 2. Update the value displays next to sliders
+            adDurationValue.textContent = `${duration}s`;
+            spotsPerDayValue.textContent = `${spots}`;
+            daysValue.textContent = `${days}`;
+            ratePerSecValue.textContent = `₹${rate.toFixed(2)}`;
+
+            // 3. Perform the calculations
+            const totalSeconds = duration * spots * days;
+            const amount = totalSeconds * rate;
+            const gst = amount * 0.18; // GST is fixed at 18%
+            const grandTotal = amount + gst;
+
+            // 4. Display the results
+            // Use toLocaleString for better number formatting (e.g., adding commas)
+            totalSecondsEl.textContent = totalSeconds.toLocaleString('en-IN');
+            amountEl.textContent = `₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            gstEl.textContent = `₹${gst.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            grandTotalEl.textContent = `₹${grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        // --- Event Listeners ---
+        // Add an 'input' event listener to each slider. This fires continuously as the slider is moved.
+        adDurationSlider.addEventListener('input', calculateAndDisplay);
+        spotsPerDaySlider.addEventListener('input', calculateAndDisplay);
+        daysSlider.addEventListener('input', calculateAndDisplay);
+        ratePerSecSlider.addEventListener('input', calculateAndDisplay);
+
+        // --- Initial Calculation ---
+        // Run the calculation once on page load to set the initial values.
+        window.onload = calculateAndDisplay;
+    </script>
+
+</body>
+</html>
